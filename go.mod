@@ -2,6 +2,8 @@ module github.com/yourusername/file-modification-tracker
 
 go 1.22.5
 
+require github.com/lxn/walk v0.0.0-20210112085537-c389da54e794
+
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/apache/thrift v0.20.0 // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/kardianos/service v1.2.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/osquery/osquery-go v0.0.0-20240910233439-561a72587be6 // indirect
@@ -39,6 +42,7 @@ require (
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	gopkg.in/Knetic/govaluate.v3 v3.0.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

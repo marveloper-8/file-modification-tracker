@@ -47,6 +47,11 @@ func (p *program) runTimerThread() {
 				return
 			default:
 				logger.Info("Checking file modifications...")
+
+				stats := getFileModificationStats(config.Directory)
+				if err := reportStatsToAPI(stats); err != nil {
+					logger.Error("Failed to report stats to API: ", err)
+				}
 				time.Sleep(1 * time.Minute)
 		}
 	}
