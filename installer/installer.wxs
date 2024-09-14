@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="FileModificationTracker" Version="1.0" Language="1033" Manufacturer="Your Company" UpgradeCode="YourUpgradeCode">
+  <Product Id="*" Name="File Modification Tracker" Version="1.0" Language="1033" Manufacturer="Marveloper-8" UpgradeCode="GUID-CODE">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
 
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate />
+    <Media Id="1" Cabinet="media.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLDIR" Name="FileModificationTracker" />
       </Directory>
     </Directory>
+    
+    <Component Id="MainExecutable" Guid="GUID-CODE">
+      <File Id="MainExecutable" Name="file-modification-tracker.exe" Source="file-modification-tracker.exe" KeyPath="yes" />
+    </Component>
 
-    <DirectoryRef Id="INSTALLDIR">
-      <Component Id="MainExecutable" Guid="PUT-GUID-HERE">
-        <File Id="FileModificationTrackerEXE" Source="file-modification-tracker.exe" KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
-    <Feature Id="MainFeature" Title="File Modification Tracker" Level="1">
+    <Feature Id="ProductFeature" Title="FileModificationTracker" Level="1">
       <ComponentRef Id="MainExecutable" />
     </Feature>
   </Product>

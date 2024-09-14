@@ -1,41 +1,59 @@
-package main
+package api
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 	"net/http"
 )
 
 type Stats struct {
 	Directory string `json:"directory"`
-	Modified time.Time `json:"modified"`
-	Files     []string `json:"files"`
+	ModifiedTime string `json:"modified_time"`
+	FileName string `json:"file_name"`
+	Status string `json:"status"`
 }
 
-func reportStatsToAPI(stats Stats) error {
-	data, err := json.Marshal(stats)
+type APIClient struct {
+	client *http.Client
+	baseURL string
+}
+
+func NewAPIClient(baseURL string) *APIClient {
+	return &APIClient{
+		client: &http.Client{Timeout: 10 * time.Second},
+		baseURL: baseURL,
+	}
+}
+
+func (api *APIClient) SendStats(stats *Stats) error {
+	jsonData, err := json.Marshal(stats)
 	if err != nil {
+		log.Printf("Error marshalling stats: %v", err)
 		return err
 	}
 	
-	req, err := http.NewRequest("POST", "http://localhost:8080/api/v1/stats", bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", api.baseURL+"/file-stats", bytes.NewBuffer(jsonData))
 	if err != nil {
+		log.Printf("Error creating request: %v", err)
 		return err
 	}
+
 	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := api.client.Do(req)
 	if err != nil {
+		log.Printf("Error sending request: %v", err)
 		return err
 	}
-	defer resp.Body.Close()
 
+	defer resp.Body.Close()
+	
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.Status)
+		log.Printf("API responded with status: %v", resp.StatusCode)
+		return err
 	}
 
+	log.Printf("Stats sent successfully")
 	return nil
 }

@@ -1,4 +1,4 @@
-module github.com/yourusername/file-modification-tracker
+module github.com/marveloper-8/file-modification-tracker
 
 go 1.22.5
 

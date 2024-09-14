@@ -1,0 +1,3 @@
+directory_to_monitor: /Users/marveloper-8/Downloads
+check_frequency: 1
+api_endpoint: http://localhost:8080/api/v1/file_modifications
