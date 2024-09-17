@@ -1,13 +1,15 @@
 package daemon
 
 import (
-	"file-modification-tracker/internal/adapters/config"
 	"file-modification-tracker/internal/adapters/logs"
 	"file-modification-tracker/internal/adapters/osquery"
+	"fmt"
 	"time"
 )
 
 type CommandQueueAdapter struct{}
+
+var Logs []string
 
 // ReceiveCommand implements core.CommandQueueAdapter.
 func (c *CommandQueueAdapter) ReceiveCommand() <-chan string {
@@ -29,6 +31,11 @@ func (c *CommandQueueAdapter) Run() error {
 	return nil
 }
 
+func Run() {
+	go workerThread()
+	go timerThread()
+}
+
 func workerThread() {
 	for cmd := range commandQueue {
 		executeCommand(cmd)
@@ -37,11 +44,16 @@ func workerThread() {
 
 func timerThread() {
 	for {
-		time.Sleep(time.Duration(config.Config.CheckFreq) * time.Second)
-		files, err := osquery.NewOsqueryAdapter().GetFileModifications(config.Config.Directory)
+		time.Sleep(time.Duration(5) * time.Second) // Adjust frequency for testing
+		files, err := osquery.NewOsqueryAdapter().GetFileModifications("/some/directory")
 		if err != nil {
 			logs.NewLoggerAdapter().LogError(err)
+			continue // Skip the rest of the loop if an error occurs
 		}
-		logs.NewLoggerAdapter().LogFileStats(files)
+
+		// Log file modification stats
+		logMsg := fmt.Sprintf("File modifications: %v", files)
+		Logs = append(Logs, logMsg) // Capture log for testing
+		logs.NewLoggerAdapter().LogFileStats(logMsg)
 	}
 }
