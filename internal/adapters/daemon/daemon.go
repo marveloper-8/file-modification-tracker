@@ -1,8 +1,8 @@
 package daemon
 import (
-	"file-modification-tracker/config"
-	"file-modification-tracker/osquery"
-	"file-modification-tracker/logs"
+	"file-modification-tracker/internal/adapters/config"
+	"file-modification-tracker/internal/adapters/osquery"
+	"file-modification-tracker/internal/adapters/logs"
 	"time"
 )
 

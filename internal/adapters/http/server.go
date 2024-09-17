@@ -3,8 +3,8 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"file-modification-tracker/daemon"
-	"file-modification-tracker/logs"
+	"file-modification-tracker/internal/adapters/daemon"
+	"file-modification-tracker/internal/adapters/logs"
 )
 
 

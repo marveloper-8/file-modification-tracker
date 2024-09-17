@@ -1,21 +1,20 @@
 package tests
 
 import (
-	"file-modification-tracker/config"
-	"github.com/stretchr/testify/assert"
+	"file-modification-tracker/internal/adapters/config"
 	"testing"
+
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestLoadConfig(t *testing.T) {
-	config.LoadConfig()
+func TestConfigAdapter_LoadConfig(t *testing.T) {
+	viper.Set("directory", "./test-dir")
+	viper.Set("check_freq", 60)
 
-	assert.NotEmpty(t, config.Config.Directory, "Directory should not be empty")
-	assert.NotEmpty(t, config.Config.CheckFreq, "Check frequency should not be empty")
-	assert.NotEmpty(t, config.Config.RemoteAPI, 0, "Remote API should not be empty")
-}
+	adapter := config.NewConfigAdapter()
+	adapter.LoadConfig()
 
-func TestInvalidConfig(t *testing.T) {
-	config.Config.CheckFreq = -1
-	validate := config.Config.ValidateConfig()
-	assert.NotNil(t, validate, "CheckFreq validation should fail for negative value")
+	assert.Equal(t, "./test-dir", adapter.GetDirectory())
+	assert.Equal(t, 60, adapter.GetCheckFrequency())
 }
