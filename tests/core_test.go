@@ -2,6 +2,7 @@ package tests
 
 import (
 	"file-modification-tracker/internal/core"
+	"file-modification-tracker/internal/adapters/logs"
 	"testing"
 	"time"
 
@@ -13,7 +14,7 @@ func TestService_StartService(t *testing.T) {
 		Directory: "./",
 		CheckFreq: 1, // 1 second for testing
 	}
-	logger := &MockLogger{}
+	logger := &logs.MockLogger{}
 	fileChecker := &MockFileChecker{}
 	commandQueue := &MockCommandQueue{
 		Commands: []string{"cmd1", "cmd2"},
@@ -33,8 +34,8 @@ func TestService_StartService(t *testing.T) {
 	assert.Contains(t, logger.LoggedInfo[1], "Executing command: cmd2")
 
 	// Validate file checks
-	assert.Greater(t, len(logger.FileStats), 0)
-	assert.Contains(t, logger.FileStats[0], "mocked file stats")
+	assert.Greater(t, len(logger.LoggedStats), 0)
+	assert.Contains(t, logger.LoggedStats[0], "mocked file stats")
 }
 
 func TestService_ErrorHandlingInFileChecker(t *testing.T) {
@@ -42,7 +43,7 @@ func TestService_ErrorHandlingInFileChecker(t *testing.T) {
 		Directory: "./",
 		CheckFreq: 1, // 1 second for testing
 	}
-	logger := &MockLogger{}
+	logger := &logs.MockLogger{}
 	fileChecker := &MockFileChecker{ShouldError: true} // Simulate error
 	commandQueue := &MockCommandQueue{}
 
@@ -55,6 +56,6 @@ func TestService_ErrorHandlingInFileChecker(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	// Validate error handling
-	assert.Greater(t, len(logger.LoggedErrors), 0)
-	assert.EqualError(t, logger.LoggedErrors[0], "error fetching file modifications")
+	assert.Greater(t, len(logger.LoggedError), 0)
+	assert.EqualError(t, logger.LoggedError[0], "error fetching file modifications")
 }

@@ -2,6 +2,7 @@ package tests
 
 import (
 	"file-modification-tracker/internal/core"
+	"file-modification-tracker/internal/adapters/logs"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -9,7 +10,7 @@ import (
 
 func TestWorkerThread_ProcessesCommands(t *testing.T) {
 	config := &MockConfig{}
-	logger := &MockLogger{}
+	logger := &logs.MockLogger{}
 	fileChecker := &MockFileChecker{}
 	commandQueue := &MockCommandQueue{
 		Commands: []string{"cmd1", "cmd2"},

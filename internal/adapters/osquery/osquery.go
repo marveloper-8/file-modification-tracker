@@ -1,8 +1,10 @@
 package osquery
 
 import (
+	"file-modification-tracker/internal/core"
 	"fmt"
 	"os/exec"
+	"time"
 )
 
 type OsqueryAdapter struct{}
@@ -25,4 +27,21 @@ func (o *OsqueryAdapter) GetFileModifications(directory string) (string, error) 
 	}
 
 	return string(output), nil
+}
+
+type FileModification struct {
+    Filename     string
+    LastModified time.Time
+}
+
+type MockOsqueryAdapter struct {
+    MockFileModifications []core.FileModification
+}
+
+func NewMockOsqueryAdapter() *MockOsqueryAdapter {
+    return &MockOsqueryAdapter{}
+}
+
+func (m *MockOsqueryAdapter) GetFileModifications(directory string) ([]core.FileModification, error) {
+    return m.MockFileModifications, nil
 }

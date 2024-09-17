@@ -34,10 +34,10 @@ func workerThread() {
 func timerThread() {
 	for {
 		time.Sleep(time.Duration(config.Config.CheckFreq) * time.Second)
-		files, err := osquery.GetFileModifications(config.Config.Directory)
+		files, err := osquery.NewOsqueryAdapter().GetFileModifications(config.Config.Directory)
 		if err != nil {
-			logs.LogError(err)
+			logs.NewLoggerAdapter().LogError(err)
 		}
-		logs.LogFileStats(files)
+		logs.NewLoggerAdapter().LogFileStats(files)
 	}
 }

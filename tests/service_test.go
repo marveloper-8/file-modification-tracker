@@ -1,6 +1,9 @@
 package tests
 
-import "errors"
+import (
+	"errors"
+	"file-modification-tracker/internal/core"
+)
 
 // Mock ConfigPort for testing.
 type MockConfig struct {
@@ -40,6 +43,11 @@ type MockFileChecker struct {
 	ShouldError bool
 }
 
+// GetFileModifications implements core.OsqueryAdapter.
+func (m *MockFileChecker) GetFileModifications(directory string) ([]core.FileModification, error) {
+	panic("unimplemented")
+}
+
 func (m *MockFileChecker) CheckModifications(directory string) (string, error) {
 	if m.ShouldError {
 		return "", errors.New("error fetching file modifications")
@@ -50,6 +58,11 @@ func (m *MockFileChecker) CheckModifications(directory string) (string, error) {
 // Mock CommandQueuePort for testing.
 type MockCommandQueue struct {
 	Commands []string
+}
+
+// ReceiveCommand implements core.CommandQueueAdapter.
+func (m *MockCommandQueue) ReceiveCommand() <-chan string {
+	panic("unimplemented")
 }
 
 func (m *MockCommandQueue) ReceiveCommands() <-chan string {

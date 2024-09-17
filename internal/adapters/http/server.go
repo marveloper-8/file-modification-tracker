@@ -2,10 +2,10 @@ package http
 
 import (
     "encoding/json"
+    "net/http"
     "file-modification-tracker/internal/core"
     "file-modification-tracker/internal/adapters/daemon"
     "file-modification-tracker/internal/adapters/logs"
-    "net/http"
 )
 
 type HTTPServer struct {
@@ -19,18 +19,18 @@ func NewHTTPServer(service *core.Service) *HTTPServer {
 }
 
 func (s *HTTPServer) Run() error {
-    http.HandleFunc("/health", healthHandler)
-    http.HandleFunc("/commands", commandHandler)
-    http.HandleFunc("/logs", logsHandler)
+    http.HandleFunc("/health", s.HealthHandler)
+    http.HandleFunc("/commands", s.CommandHandler)
+    http.HandleFunc("/logs", s.LogsHandler)
 
     return http.ListenAndServe(":8080", nil)
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func (s *HTTPServer) HealthHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
 }
 
-func commandHandler(w http.ResponseWriter, r *http.Request) {
+func (s *HTTPServer) CommandHandler(w http.ResponseWriter, r *http.Request) {
     var commands []string
     json.NewDecoder(r.Body).Decode(&commands)
 
@@ -41,7 +41,7 @@ func commandHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(map[string]string{"status": "queued"})
 }
 
-func logsHandler(w http.ResponseWriter, r *http.Request) {
-    logs.NewLoggerAdapter().RetrieveLogs()
-    json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+func (s *HTTPServer) LogsHandler(w http.ResponseWriter, r *http.Request) {
+    logs := logs.NewLoggerAdapter().RetrieveLogs()
+    json.NewEncoder(w).Encode(logs)
 }

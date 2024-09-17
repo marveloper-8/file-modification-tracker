@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"file-modification-tracker/daemon"
+	"file-modification-tracker/internal/adapters/daemon"
 	"testing"
 	"time"
 )

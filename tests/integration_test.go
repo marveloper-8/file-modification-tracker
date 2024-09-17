@@ -14,8 +14,8 @@ import (
 func TestIntegration_ServiceStartsSuccessfully(t *testing.T) {
 	// Initialize adapters
 	configAdapter := config.NewConfigAdapter()
-	loggerAdapter := &logs.MockLogger{}             // Use the mock logger here
-	osqueryAdapter := &osquery.MockOsqueryAdapter{} // Mock the osquery
+	loggerAdapter := &logs.MockLogger{}
+	osqueryAdapter := &osquery.MockOsqueryAdapter{}
 	commandQueueAdapter := &MockCommandQueue{Commands: []string{"cmd1"}}
 
 	// Inject dependencies into the core service

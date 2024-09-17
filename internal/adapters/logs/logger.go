@@ -63,3 +63,29 @@ func (l *LoggerAdapter) RetrieveLogs() []logrus.Entry {
 	defer l.mu.Unlock()
 	return l.logs
 }
+
+type MockLogger struct {
+    LoggedInfo  []string
+    LoggedError []error
+    LoggedStats []interface{}
+}
+
+func NewMockLogger() *MockLogger {
+    return &MockLogger{
+        LoggedInfo:  []string{},
+        LoggedError: []error{},
+        LoggedStats: []interface{}{},
+    }
+}
+
+func (m *MockLogger) LogInfo(msg string) {
+    m.LoggedInfo = append(m.LoggedInfo, msg)
+}
+
+func (m *MockLogger) LogError(err error) {
+    m.LoggedError = append(m.LoggedError, err)
+}
+
+func (m *MockLogger) LogFileStats(stats interface{}) {
+    m.LoggedStats = append(m.LoggedStats, stats)
+}
