@@ -26,9 +26,9 @@ func (c *ConfigAdapter) LoadConfig() {
 }
 
 func (c *ConfigAdapter) GetDirectory() string {
-	return c.directory
+	return Config.Directory
 }
 
 func (c *ConfigAdapter) GetCheckFrequency() int {
-	return c.checkFreq
+	return Config.CheckFreq
 }

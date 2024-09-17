@@ -8,7 +8,6 @@ import (
 	"file-modification-tracker/internal/adapters/osquery"
 	"file-modification-tracker/internal/adapters/ui"
 	"file-modification-tracker/internal/core"
-	"log"
 	"os"
 )
 

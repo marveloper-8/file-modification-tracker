@@ -5,7 +5,18 @@ import (
 	"os/exec"
 )
 
-func GetFileModifications(directory string) (string, error) {
+type OsqueryAdapter struct{}
+
+// CheckModifications implements core.FileCheckerPort.
+func (o *OsqueryAdapter) CheckModifications(directory string) (string, error) {
+	panic("unimplemented")
+}
+
+func NewOsqueryAdapter() *OsqueryAdapter {
+	return &OsqueryAdapter{}
+}
+
+func (o *OsqueryAdapter) GetFileModifications(directory string) (string, error) {
 	query := fmt.Sprintf("select path from osquery_file_events where parent_directory_name = '%s'", directory)
 	cmd := exec.Command("osqueryi", "--json", query)
 	output, err := cmd.Output()

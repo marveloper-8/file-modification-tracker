@@ -1,46 +1,67 @@
 package core
 
-import "time"
+import (
+	"time"
+)
 
-// Service defines the core structure of the file modification service.
 type Service struct {
-	Config       ConfigPort
-	Logger       LoggerPort
-	FileChecker  FileCheckerPort
-	CommandQueue CommandQueuePort
+	configAdapter  ConfigAdapter
+	loggerAdapter  LoggerAdapter
+	osqueryAdapter OsqueryAdapter
+	commandQueue   CommandQueueAdapter
 }
 
-// NewService creates a new service instance.
-func NewService(config ConfigPort, logger LoggerPort, fileChecker FileCheckerPort, commandQueue CommandQueuePort) *Service {
+func NewService(
+	configAdapter ConfigAdapter,
+	loggerAdapter LoggerAdapter,
+	osqueryAdapter OsqueryAdapter,
+	commandQueue CommandQueueAdapter,
+) *Service {
 	return &Service{
-		Config:       config,
-		Logger:       logger,
-		FileChecker:  fileChecker,
-		CommandQueue: commandQueue,
+		configAdapter:  configAdapter,
+		loggerAdapter:  loggerAdapter,
+		osqueryAdapter: osqueryAdapter,
+		commandQueue:   commandQueue,
 	}
 }
 
-// StartService runs the service.
 func (s *Service) StartService() {
-	go s.workerThread()
-	go s.timerThread()
+	go s.runWorkerThread()
+	go s.runTimerThread()
 }
 
-func (s *Service) workerThread() {
-	for cmd := range s.CommandQueue.ReceiveCommands() {
-		s.Logger.LogInfo("Executing command: " + cmd)
-		// handle command execution
+func (s *Service) runWorkerThread() {
+	for cmd := range s.commandQueue.ReceiveCommand() {
+		s.executeCommand(cmd)
 	}
 }
 
-func (s *Service) timerThread() {
+func (s *Service) runTimerThread() {
 	for {
-		time.Sleep(time.Duration(s.Config.GetCheckFrequency()) * time.Second)
-		files, err := s.FileChecker.CheckModifications(s.Config.GetDirectory())
+		// Config for check frequency
+		checkFreq := s.configAdapter.GetCheckFrequency()
+		directory := s.configAdapter.GetDirectory()
+
+		// Wait for the check frequency interval
+		time.Sleep(time.Duration(checkFreq) * time.Second)
+
+		// Get file modifications using the osquery adapter
+		files, err := s.osqueryAdapter.GetFileModifications(directory)
 		if err != nil {
-			s.Logger.LogError(err)
+			s.loggerAdapter.LogError(err)
 			continue
 		}
-		s.Logger.LogFileStats(files)
+
+		// Log file stats
+		s.loggerAdapter.LogFileStats(files)
 	}
+}
+
+func (s *Service) executeCommand(cmd string) {
+	// Command execution logic goes here
+	s.loggerAdapter.LogFileStats("Executed: " + cmd)
+}
+
+func (s *Service) RunWorker() {
+    s.runWorkerThread()
 }

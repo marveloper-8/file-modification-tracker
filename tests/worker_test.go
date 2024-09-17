@@ -4,6 +4,7 @@ import (
 	"file-modification-tracker/internal/core"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestWorkerThread_ProcessesCommands(t *testing.T) {
@@ -15,7 +16,7 @@ func TestWorkerThread_ProcessesCommands(t *testing.T) {
 	}
 
 	service := core.NewService(config, logger, fileChecker, commandQueue)
-	go service.workerThread()
+	go service.RunWorker()
 
 	// Allow time for commands to process
 	time.Sleep(1 * time.Second)
