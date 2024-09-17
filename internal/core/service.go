@@ -38,30 +38,27 @@ func (s *Service) runWorkerThread() {
 
 func (s *Service) runTimerThread() {
 	for {
-		// Config for check frequency
+
 		checkFreq := s.configAdapter.GetCheckFrequency()
 		directory := s.configAdapter.GetDirectory()
 
-		// Wait for the check frequency interval
 		time.Sleep(time.Duration(checkFreq) * time.Second)
 
-		// Get file modifications using the osquery adapter
 		files, err := s.osqueryAdapter.GetFileModifications(directory)
 		if err != nil {
 			s.loggerAdapter.LogError(err)
 			continue
 		}
 
-		// Log file stats
 		s.loggerAdapter.LogFileStats(files)
 	}
 }
 
 func (s *Service) executeCommand(cmd string) {
-	// Command execution logic goes here
+
 	s.loggerAdapter.LogFileStats("Executed: " + cmd)
 }
 
 func (s *Service) RunWorker() {
-    s.runWorkerThread()
+	s.runWorkerThread()
 }

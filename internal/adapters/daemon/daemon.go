@@ -9,13 +9,17 @@ import (
 
 type CommandQueueAdapter struct{}
 
-// ReceiveCommands implements core.CommandQueuePort.
-func (c *CommandQueueAdapter) ReceiveCommands() <-chan string {
+// ReceiveCommand implements core.CommandQueueAdapter.
+func (c *CommandQueueAdapter) ReceiveCommand() <-chan string {
 	panic("unimplemented")
 }
 
+func (c *CommandQueueAdapter) ReceiveCommands() <-chan string {
+	return commandQueue
+}
+
 func NewCommandQueueAdapter() *CommandQueueAdapter {
-	commandQueue = make(chan string, 10) // Buffered channel
+	commandQueue = make(chan string, 10)
 	return &CommandQueueAdapter{}
 }
 

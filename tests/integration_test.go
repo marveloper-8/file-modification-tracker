@@ -12,22 +12,18 @@ import (
 )
 
 func TestIntegration_ServiceStartsSuccessfully(t *testing.T) {
-	// Initialize adapters
+
 	configAdapter := config.NewConfigAdapter()
 	loggerAdapter := &logs.MockLogger{}
 	osqueryAdapter := &osquery.MockOsqueryAdapter{}
 	commandQueueAdapter := &MockCommandQueue{Commands: []string{"cmd1"}}
 
-	// Inject dependencies into the core service
 	service := core.NewService(configAdapter, loggerAdapter, osqueryAdapter, commandQueueAdapter)
 
-	// Start service
 	go service.StartService()
 
-	// Let it run for a short time
 	time.Sleep(2 * time.Second)
 
-	// Assert that the command was executed and logs captured
 	assert.Equal(t, 1, len(loggerAdapter.LoggedInfo))
 	assert.Contains(t, loggerAdapter.LoggedInfo[0], "Executing command: cmd1")
 }

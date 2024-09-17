@@ -3,6 +3,7 @@ package logs
 import (
 	"sync"
 	"github.com/sirupsen/logrus"
+	"fmt"
 )
 
 type LoggerAdapter struct {
@@ -44,19 +45,20 @@ func (l *LoggerAdapter) LogInfo(msg string) {
 	}).Info("Info logged")
 }
 
-func (l *LoggerAdapter) LogFileStats(stats string) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	entry := logrus.Entry{
-		Message: stats,
-		Level:   logrus.InfoLevel,
-	}
-	l.logs = append(l.logs, entry)
-	logrus.WithFields(logrus.Fields{
-		"type": "file_stats",
-		"data": stats,
-	}).Info("File stats logged")
+func (l *LoggerAdapter) LogFileStats(stats interface{}) {
+    l.mu.Lock()
+    defer l.mu.Unlock()
+    entry := logrus.Entry{
+        Message: fmt.Sprintf("%v", stats),
+        Level:   logrus.InfoLevel,
+    }
+    l.logs = append(l.logs, entry)
+    logrus.WithFields(logrus.Fields{
+        "type": "file_stats",
+        "data": stats,
+    }).Info("File stats logged")
 }
+
 
 func (l *LoggerAdapter) RetrieveLogs() []logrus.Entry {
 	l.mu.Lock()

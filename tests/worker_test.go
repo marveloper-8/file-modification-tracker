@@ -19,7 +19,6 @@ func TestWorkerThread_ProcessesCommands(t *testing.T) {
 	service := core.NewService(config, logger, fileChecker, commandQueue)
 	go service.RunWorker()
 
-	// Allow time for commands to process
 	time.Sleep(1 * time.Second)
 
 	assert.Equal(t, 2, len(logger.LoggedInfo))

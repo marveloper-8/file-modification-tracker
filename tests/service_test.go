@@ -5,7 +5,6 @@ import (
 	"file-modification-tracker/internal/core"
 )
 
-// Mock ConfigPort for testing.
 type MockConfig struct {
 	Directory string
 	CheckFreq int
@@ -19,7 +18,6 @@ func (m *MockConfig) GetCheckFrequency() int {
 	return m.CheckFreq
 }
 
-// Mock LoggerPort for testing.
 type MockLogger struct {
 	LoggedErrors []error
 	LoggedInfo   []string
@@ -38,12 +36,10 @@ func (m *MockLogger) LogFileStats(stats string) {
 	m.FileStats = append(m.FileStats, stats)
 }
 
-// Mock FileCheckerPort for testing.
 type MockFileChecker struct {
 	ShouldError bool
 }
 
-// GetFileModifications implements core.OsqueryAdapter.
 func (m *MockFileChecker) GetFileModifications(directory string) ([]core.FileModification, error) {
 	panic("unimplemented")
 }
@@ -55,12 +51,10 @@ func (m *MockFileChecker) CheckModifications(directory string) (string, error) {
 	return "mocked file stats", nil
 }
 
-// Mock CommandQueuePort for testing.
 type MockCommandQueue struct {
 	Commands []string
 }
 
-// ReceiveCommand implements core.CommandQueueAdapter.
 func (m *MockCommandQueue) ReceiveCommand() <-chan string {
 	panic("unimplemented")
 }

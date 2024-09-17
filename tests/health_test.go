@@ -1,33 +1,28 @@
 package tests
 
 import (
-    "net/http"
-    "net/http/httptest"
-    "testing"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-    "github.com/stretchr/testify/assert"
-    "file-modification-tracker/internal/core"
-    httpServer "file-modification-tracker/internal/adapters/http"
+	httpServer "file-modification-tracker/internal/adapters/http"
+	"file-modification-tracker/internal/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHealthHandler(t *testing.T) {
-    // Create a new HTTPServer instance
-    service := &core.Service{} // You might need to mock this
-    server := httpServer.NewHTTPServer(service)
 
-    // Create a request to pass to our handler
-    req, err := http.NewRequest("GET", "/health", nil)
-    assert.NoError(t, err)
+	service := &core.Service{}
+	server := httpServer.NewHTTPServer(service)
 
-    // Create a ResponseRecorder to record the response
-    rr := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/health", nil)
+	assert.NoError(t, err)
 
-    // Call the handler directly
-    server.HealthHandler(rr, req)
+	rr := httptest.NewRecorder()
 
-    // Check the status code
-    assert.Equal(t, http.StatusOK, rr.Code)
+	server.HealthHandler(rr, req)
 
-    // Check the response body
-    assert.Contains(t, rr.Body.String(), `"status":"healthy"`)
+	assert.Equal(t, http.StatusOK, rr.Code)
+
+	assert.Contains(t, rr.Body.String(), `"status":"healthy"`)
 }

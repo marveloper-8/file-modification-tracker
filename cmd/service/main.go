@@ -12,19 +12,16 @@ import (
 )
 
 func main() {
-	// Initialize adapters
+
 	configAdapter := config.NewConfigAdapter()
 	loggerAdapter := logs.NewLoggerAdapter()
 	osqueryAdapter := osquery.NewOsqueryAdapter()
 	commandQueueAdapter := daemon.NewCommandQueueAdapter()
 
-	// Inject dependencies into the core service
 	service := core.NewService(configAdapter, loggerAdapter, osqueryAdapter, commandQueueAdapter)
 
-	// Start service
 	service.StartService()
 
-	// Initialize HTTP server
 	go func() {
 		err := http.NewHTTPServer(service).Run()
 		if err != nil {
@@ -33,7 +30,6 @@ func main() {
 		}
 	}()
 
-	// Initialize UI
 	go func() {
 		err := ui.NewUI().Run()
 		if err != nil {
@@ -42,5 +38,5 @@ func main() {
 		}
 	}()
 
-	select {} // Keep main running
+	select {}
 }
