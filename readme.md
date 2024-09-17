@@ -1,186 +1,165 @@
 # File Modification Tracker
 
-### Project Description
-The **File Modification Tracker** is a Windows service built with Go that monitors a specified directory for file modifications. It tracks changes using `osquery` for system monitoring and logs the results. The service runs as a background daemon and provides several functionalities:
+The **File Modification Tracker** is a system service designed to track file modifications on a Windows system using **osquery**, log the results, and provide interfaces to interact with the service via an HTTP API and a Windows UI. This project is structured using **Hexagonal Architecture** (Ports and Adapters), making it flexible, maintainable, and scalable.
 
-- Tracks file modifications in a given directory using `osquery`.
-- Manages configuration using `viper` and validates it with `validator`.
-- Offers HTTP endpoints to interact with the service for health checks, logs retrieval, and worker thread management.
-- Provides a native Windows UI built with `Fyne` to allow users to start/stop the service and view logs.
-- Packages the service as an `.msi` installer for Windows.
+## Table of Contents
 
----
+1. [Features](#features)
+2. [Architecture](#architecture)
+3. [Installation](#installation)
+4. [Running the Application](#running-the-application)
+5. [HTTP API](#http-api)
+6. [UI Interface](#ui-interface)
+7. [Configuration](#configuration)
+8. [Testing](#testing)
+9. [Logging](#logging)
 
-### Features
-- **Daemon**: Runs in the background as a Windows service with worker and timer threads.
-- **File Monitoring**: Uses `osquery` to retrieve file modification statistics.
-- **HTTP API**: Provides endpoints for submitting commands to the worker thread, checking the health of the service, and retrieving logs.
-- **UI Component**: A native Windows UI to interact with the service.
-- **Logging**: Logs file modification statistics and service activity.
-- **Configurable**: Manages settings through `viper` and validates with `validator`.
-- **MSI Packaging**: The service is packaged as an `.msi` file for easy installation and uninstallation on Windows.
+## Features
 
----
+- Tracks file modifications in a specified directory using **osquery**.
+- Exposes an HTTP API for system health, command management, and logs.
+- Provides a Windows UI using the **Fyne** framework.
+- Log errors and file stats using **Logrus**.
+- Easily configurable via a YAML file.
+- Structured using Hexagonal Architecture.
+
+## Architecture
+
+This project is built using **Hexagonal Architecture**, also known as **Ports and Adapters**. The architecture is divided into the following layers:
+
+- **Core**: Contains the business logic of the application. Interfaces (Ports) are defined here.
+- **Adapters**: Implements the interfaces from the core and interacts with external systems such as logging, osquery, HTTP server, and UI.
+- **Infrastructure**: Contains configuration and setup code.
+  
+```
+file-modification-tracker/
+├── cmd/                                # Entrypoint
+│   └── service/
+│       └── main.go                     # Main service code
+├── internal/
+│   ├── adapters/
+│   │   ├── config/                     # Configuration handling
+│   │   ├── daemon/                     # Daemon management
+│   │   ├── http/                       # HTTP server
+│   │   ├── logs/                       # Logging functionality
+│   │   ├── osquery/                    # Osquery integration
+│   │   └── ui/                         # Windows UI
+│   └── core/                           # Business logic and interfaces
+├── tests/                              # Unit tests
+├── config.yaml                         # Configuration file (YAML)
+├── service.wxs                         # WiX configuration for MSI packaging
+├── go.mod                              # Go module file
+├── go.sum                              # Go dependencies
+└── README.md                           # Project documentation
+```
+
+## Installation
 
 ### Prerequisites
-Ensure you have the following installed on your system:
-- **Go (1.18 or later)**: [Download Go](https://golang.org/dl/)
-- **WiX Toolset** (for building MSI packages): [WiX Toolset](https://wixtoolset.org/)
-- **osquery**: [Download osquery](https://osquery.io/downloads/official/windows)
 
----
+- **Go** (1.18+)
+- **osquery** (installed and available in your system path)
+- **WiX Toolset** (for MSI packaging on Windows)
 
-### Project Structure
+### Steps
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-repo/file-modification-tracker.git
+    cd file-modification-tracker
+    ```
+
+2. Install Go dependencies:
+
+    ```bash
+    go mod tidy
+    ```
+
+3. Install `osquery` on your system, if not already installed. You can find installation instructions on the official [osquery website](https://osquery.io/).
+
+4. Build the project:
+
+    ```bash
+    go build -o bin/file-modification-tracker cmd/service/main.go
+    ```
+
+5. (Optional) Package the application as an MSI installer using WiX:
+
+    ```bash
+    candle service.wxs
+    light service.wixobj -o FileModificationTracker.msi
+    ```
+
+## Running the Application
+
+To run the application:
+
 ```bash
-file-modification-tracker/
-├── cmd/
-│   └── service/
-│       └── main.go            # Main service code
-├── config/
-│   └── config.go              # Configuration handling
-├── daemon/
-│   ├── daemon.go              # Daemon management
-│   ├── worker.go              # Worker thread
-├── http/
-│   └── server.go              # HTTP server
-├── logs/
-│   └── logger.go              # Logging functionality
-├── osquery/
-│   └── osquery.go             # Osquery integration
-├── ui/
-│   └── ui.go                  # Windows UI using Fyne
-├── tests/
-│   ├── config_test.go         # Unit tests for configuration
-│   ├── worker_test.go         # Unit tests for worker thread
-│   └── timer_test.go          # Unit tests for timer thread
-├── config.yaml                # Configuration file (YAML)
-├── service.wxs                # WiX configuration for MSI packaging
-├── go.mod                     # Go module file
-├── go.sum                     # Go dependencies
-└── README.md                  # Project documentation
+./bin/file-modification-tracker
 ```
 
----
+The application will start:
+- The service will begin tracking file modifications in the configured directory.
+- An HTTP server will be available on port 8080.
+- A UI window will open for interacting with the service on Windows.
 
-### Configuration
+## HTTP API
 
-The configuration file `config.yaml` is used to manage the service settings. The file should be placed in the root directory and contain the following settings:
+The application provides a simple HTTP API for health checks, command management, and retrieving logs.
+
+### Endpoints
+
+- **GET /health**: Returns the health status of the service.
+- **POST /commands**: Accepts a list of commands to execute.
+- **GET /logs**: Retrieves logs generated by the system.
+
+Example usage:
+
+```bash
+curl http://localhost:8080/health
+```
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+## UI Interface
+
+The application uses the **Fyne** framework to provide a basic Windows UI for interacting with the service.
+
+- **Start Service**: Starts tracking file modifications.
+- **Stop Service**: Stops the tracking service.
+- **Logs Display**: Displays the logs generated by the service.
+
+## Configuration
+
+Configuration is done via the `config.yaml` file. Here’s an example of what the configuration looks like:
 
 ```yaml
-directory: "C:/path/to/monitor"  # Directory to monitor
-check_freq: 60                   # Frequency (in seconds) of file modification checks
-remote_api: "https://api.example.com/collect"  # Remote API to send stats
+directory: ./tracked_directory   # Directory to monitor
+check_freq: 60                   # Frequency of checks (in seconds)
+remote_api: http://localhost:8080 # API URL (if using remote interaction)
 ```
 
-You can customize the directory, frequency of checks, and API endpoint for reporting.
+Ensure you set the correct values for your environment.
 
----
+## Testing
 
-### Build Instructions
-
-#### 1. **Clone the Repository**
+Unit tests are available under the `tests/` directory. You can run the tests using the following command:
 
 ```bash
-git clone https://github.com/your-username/file-modification-tracker.git
-cd file-modification-tracker
+go test ./tests/...
 ```
 
-#### 2. **Install Dependencies**
+### Sample Tests
 
-```bash
-go mod tidy
-```
+- **Configuration Tests**: Ensures the configuration is loaded and validated correctly.
+- **HTTP API Tests**: Tests the health and logs HTTP endpoints.
+- **Worker and Daemon Tests**: Validates the worker threads and file modification tracking.
 
-#### 3. **Install Required Go Libraries**
+## Logging
 
-```bash
-# Install viper for configuration management
-go get github.com/spf13/viper
-
-# Install validator for configuration validation
-go get github.com/go-playground/validator/v10
-
-# Install Fyne for UI
-go get fyne.io/fyne/v2
-
-# Install testify for unit testing
-go get github.com/stretchr/testify
-```
-
-#### 4. **Build the Go Binary**
-
-To build the service for Windows:
-
-```bash
-GOOS=windows GOARCH=amd64 go build -o file-modification-tracker.exe ./cmd/service
-```
-
-#### 5. **Create MSI Installer**
-
-Make sure you have WiX Toolset installed, then use the following commands to create an `.msi` installer:
-
-```bash
-# Compile the WiX source file
-candle service.wxs
-
-# Link and create the MSI package
-light -out service.msi service.wixobj
-```
-
-#### 6. **Install the MSI Package**
-
-Once the `.msi` is created, you can install the service using the following command:
-
-```bash
-msiexec /i service.msi
-```
-
-#### 7. **Run Unit Tests**
-
-To run the unit tests for the core functionalities (configuration, worker, timer):
-
-```bash
-go test ./tests
-```
-
----
-
-### Usage Instructions
-
-1. **Start the Service**:
-   - Run the installed service through Windows Service Manager, or execute the binary directly:
-   
-   ```bash
-   ./file-modification-tracker.exe
-   ```
-
-2. **Interact with the Service**:
-   - Use the native Windows UI (built using Fyne) to start/stop the service and view logs.
-   - Or, access the HTTP endpoints:
-     - **Submit Commands to Worker Thread**:
-       ```bash
-       curl -X POST http://localhost:8080/commands -d '{"commands": ["echo Hello"]}'
-       ```
-     - **Check Service Health**:
-       ```bash
-       curl http://localhost:8080/health
-       ```
-     - **Retrieve Logs**:
-       ```bash
-       curl http://localhost:8080/logs
-       ```
-
----
-
-### Uninstallation
-
-To uninstall the service, run the following command:
-
-```bash
-msiexec /x service.msi
-```
-
----
-
-### License
-This project is licensed under the MIT License.
+Logging is handled using **Logrus**. Logs are output to both the console and retained internally for retrieval via the HTTP API or UI. Errors and file stats are logged with specific logging levels.
